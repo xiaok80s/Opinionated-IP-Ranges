@@ -1,0 +1,40 @@
+name: Update IPv4 Ranges
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  Refresh-IP-Ranges:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up Homebrew
+        id: set-up-homebrew
+        uses: Homebrew/actions/setup-homebrew@master
+
+      - name: Install cidrmerge
+        run: |
+          brew install cidrmerge
+
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Refresh IP ranges
+        run: |
+          sh ./refresh.sh
+
+      - name: Commit latest IP ranges
+        run: |
+          if ! git diff --quiet; then
+            git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+            git config --global user.name "${{ github.actor }}"
+            git add opinionated_ip_ranges.txt
+            git commit -m "Update opinionated_ip_ranges.txt"
+            git pushx
+          else
+            echo "IP ranges unchanged"
+          fi
