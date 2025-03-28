@@ -36,7 +36,7 @@ jobs:
             git config --global user.name "${{ github.actor }}"
             git add opinionated_ip_ranges.txt
             git commit -m "Update opinionated_ip_ranges.txt"
-            git pushx
+            git push
           else
             echo "IP ranges unchanged"
           fi
